@@ -65,7 +65,11 @@ export default function Home(): JSX.Element {
         Run query
       </Button>
       {columns.length ? (
-        <Table<ResultRow> columns={columns} dataSource={resultRows} />
+        <Table<ResultRow>
+          scroll={{ x: "auto", y: "60vh" }}
+          columns={columns}
+          dataSource={resultRows}
+        />
       ) : (
         <Empty />
       )}
