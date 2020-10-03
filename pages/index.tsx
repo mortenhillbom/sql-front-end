@@ -1,5 +1,6 @@
-import { Button, message, Table } from "antd";
+import { Button, Empty, message, Table } from "antd";
 import TextArea from "antd/lib/input/TextArea";
+import { ColumnProps } from "antd/lib/table";
 import Title from "antd/lib/typography/Title";
 import Head from "next/head";
 import { useEffect, useState } from "react";
@@ -8,15 +9,9 @@ import styles from "../styles/Home.module.css";
 type ResultRow = { [key: string]: string | number };
 
 export default function Home(): JSX.Element {
-  const [tables, setTables] = useState<any>("nothing");
   const [userQuery, setUserQuery] = useState<string>("");
   const [resultRows, setResultRows] = useState<ResultRow[]>([]);
-
-  const handleDB = async () => {
-    const { items: newTables } = await (await fetch("api/table-names")).json();
-    setTables(newTables);
-  };
-
+  const [columns, setColumns] = useState<ColumnProps<ResultRow>[]>([]);
   const handleResetDB = async () => {
     const { success, error } = await (await fetch("api/reset-db")).json();
     if (success) {
@@ -40,8 +35,18 @@ export default function Home(): JSX.Element {
   };
 
   useEffect(() => {
-    handleDB();
-  }, []);
+    if (!resultRows.length) {
+      setColumns([]);
+    } else {
+      const cols = Object.keys(resultRows[0]).map((col) => ({
+        title: col,
+        dataIndex: col,
+        key: col,
+        render: (r) => JSON.stringify(r),
+      }));
+      setColumns(cols);
+    }
+  }, [resultRows]);
 
   return (
     <div className={styles.container}>
@@ -59,10 +64,11 @@ export default function Home(): JSX.Element {
       <Button onClick={handleRunQuery} type="primary">
         Run query
       </Button>
-      <Table
-        columns={[{ title: "One col", dataIndex: "colOne", key: "colOne" }]}
-        dataSource={resultRows.map((r) => ({ colOne: r[Object.keys(r)[0]] }))}
-      />
+      {columns.length ? (
+        <Table<ResultRow> columns={columns} dataSource={resultRows} />
+      ) : (
+        <Empty />
+      )}
     </div>
   );
 }
