@@ -1,5 +1,5 @@
 /* eslint-disable no-use-before-define */
-import { Button, Empty, message, Table } from "antd";
+import { Button, Empty, message, Table, Alert } from "antd";
 import { ColumnProps } from "antd/lib/table";
 import Title from "antd/lib/typography/Title";
 import QueryEditor from "components/QueryEditor";
@@ -23,6 +23,7 @@ export default function Home(): JSX.Element {
   const [userQuery, setUserQuery] = useState<string>("");
   const [resultRows, setResultRows] = useState<ResultRow[]>([]);
   const [columns, setColumns] = useState<ColumnProps<ResultRow>[]>([]);
+  const [errorMessage, setErrorMessage] = useState<string>("");
 
   const handleResetDB = async () => {
     const { success, error } = await (await fetch("api/reset-db")).json();
@@ -34,16 +35,21 @@ export default function Home(): JSX.Element {
   };
 
   const handleRunQuery = async () => {
-    const { items: rows } = await (
-      await fetch("api/query", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({ sqlQuery: userQuery }),
-      })
-    ).json();
-    setResultRows(rows);
+    const res = await fetch("api/query", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({ sqlQuery: userQuery }),
+    });
+    const { items: rows, error } = await res.json();
+
+    if (error) {
+      setErrorMessage(error);
+    } else if (rows) {
+      setErrorMessage("");
+      setResultRows(rows);
+    }
   };
 
   useEffect(() => {
@@ -76,6 +82,7 @@ export default function Home(): JSX.Element {
       </QueryWrapper>
       <ResultWrapper>
         <Title level={3}>Results:</Title>
+        {errorMessage && <Alert type="error" message={errorMessage} />}
         {columns.length ? (
           <Table<ResultRow>
             scroll={{ x: "auto", y: "50vh" }}
