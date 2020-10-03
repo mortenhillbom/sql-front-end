@@ -1,3 +1,21 @@
+# SQL Front End
+
+I managed to get it working functionally in four hours, but as you can see the front end looks kinda lame. I couldn't resist and had to make it look a bit better. Those changes can be found in the branch `overtime`, I didn't speend so much time on this though
+
+
+## Instructions
+This project is dependent on a postgres instance running on port 5432.
+
+
+To get this up and running easily you can follow these steps:
+
+1. Install [docker](https://docs.docker.com/desktop/) and [docker-compose](https://docs.docker.com/compose/install/)
+2. Run `docker-compose up` in the same folder as `docker-compose.yml` (the root folder)
+3. To start the frontend run `yarn` and then `yarn dev`
+3. Go to `localhost:3000` and cick the "Reset DB" button to start with a freshly populated data base.
+
+
+
 This is a [Next.js](https://nextjs.org/) project bootstrapped with [`create-next-app`](https://github.com/vercel/next.js/tree/canary/packages/create-next-app).
 
 ## Getting Started
