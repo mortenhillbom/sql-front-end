@@ -1,8 +1,8 @@
 /* eslint-disable no-use-before-define */
 import { Button, Empty, message, Table } from "antd";
-import TextArea from "antd/lib/input/TextArea";
 import { ColumnProps } from "antd/lib/table";
 import Title from "antd/lib/typography/Title";
+import QueryEditor from "components/QueryEditor";
 import Head from "next/head";
 import { useEffect, useState } from "react";
 import styled from "styled-components";
@@ -69,11 +69,7 @@ export default function Home(): JSX.Element {
       </TitleWrapper>
       <QueryWrapper>
         <Title level={3}>Query:</Title>
-        <TextArea
-          style={{ height: "100%" }}
-          value={userQuery}
-          onChange={(e) => setUserQuery(e.target.value)}
-        />
+        <QueryEditor query={userQuery} setQuery={setUserQuery} />
         <Button onClick={handleRunQuery} type="primary">
           Run query
         </Button>
