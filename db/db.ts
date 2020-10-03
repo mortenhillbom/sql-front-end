@@ -14,6 +14,7 @@ const DB_SETUP_SCRIPT_URL =
 const pool = new Pool(localPgConfig);
 
 pool.on("error", (err): void => {
+  // eslint-disable-next-line no-console
   console.error("Unexpected error", err);
 });
 
@@ -27,17 +28,20 @@ const tableNamesQuery = `SELECT table_name
 
 export const getTables = async (): Promise<string[]> => {
   const { rows } = await sqlQuery(tableNamesQuery);
-  return rows;
+  return rows.map((t) => t.table_name);
 };
 
-export const resetDb = async (): Promise<{ success: boolean, error?: string}> => {
+export const resetDb = async (): Promise<{
+  success: boolean;
+  error?: string;
+}> => {
   const cleanUpQuery = "DROP TABLE IF EXISTS blocks;";
   const setUpQuery = await fetch(DB_SETUP_SCRIPT_URL).then((res) => res.text());
   try {
     await sqlQuery(cleanUpQuery);
     await sqlQuery(setUpQuery);
-    return {success: true};
+    return { success: true };
   } catch (e) {
-    return { success: false, error: e.message}
+    return { success: false, error: e.message };
   }
 };

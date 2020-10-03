@@ -1,13 +1,13 @@
 import Head from "next/head";
-import styles from "../styles/Home.module.css";
 import { useEffect, useState } from "react";
+import styles from "../styles/Home.module.css";
 
-export default function Home() {
+export default function Home(): JSX.Element {
   const [tables, setTables] = useState<any>("nothing");
 
   const handleDB = async () => {
-    const { items: tables } = await (await fetch("api/table-names")).json();
-    setTables(tables);
+    const { items: newTables } = await (await fetch("api/table-names")).json();
+    setTables(newTables);
   };
 
   useEffect(() => {
