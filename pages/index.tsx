@@ -42,7 +42,7 @@ export default function Home(): JSX.Element {
         title: col,
         dataIndex: col,
         key: col,
-        render: (r) => JSON.stringify(r),
+        render: (r) => (typeof r === "object" ? JSON.stringify(r) : r),
       }));
       setColumns(cols);
     }
