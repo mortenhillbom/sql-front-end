@@ -1,4 +1,4 @@
-import { Pool, QueryResult } from "pg";
+import { Pool, QueryResult, types } from "pg";
 
 const localPgConfig = {
   max: 1,
@@ -10,6 +10,12 @@ const localPgConfig = {
 
 const DB_SETUP_SCRIPT_URL =
   "https://gist.githubusercontent.com/mewwts/ddaf0724a285782dc54b70411776fbc7/raw/09c8617a6d41f6c5ce8ee192a1c66ed0f1ff1580/blocks.sql";
+
+const bytArrayParse = (val: string) => {
+  return val.replace("\\", "0");
+};
+
+types.setTypeParser(types.builtins.BYTEA, bytArrayParse);
 
 const pool = new Pool(localPgConfig);
 
