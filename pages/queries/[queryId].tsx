@@ -10,6 +10,8 @@ import { Resizable } from "re-resizable";
 import { useRouter } from "next/router";
 import useLocalStorage from "hooks/useLocalStorage";
 
+const BASE_URL = "http://localhost:3000/api";
+
 type ResultRow = { [key: string]: string | number | any };
 
 const parseTableColumns = (sampleRow: any) =>
@@ -22,45 +24,48 @@ const parseTableColumns = (sampleRow: any) =>
   }));
 
 export default function Home(): JSX.Element {
+  const router = useRouter();
+  const { queryId } = router.query;
+
   const [userQuery, setUserQuery] = useState<string>("");
   const [resultRows, setResultRows] = useState<ResultRow[]>([]);
   const [columns, setColumns] = useState<ColumnProps<ResultRow>[]>([]);
   const [errorMessage, setErrorMessage] = useState<string>("");
-  const [selectedQuery, setSelectedQuery] = useState<string>("");
 
-  type Queries = { [key: string]: { query: string } };
+  interface Queries {
+    [key: string]: { query: string; id: string };
+  }
 
-  const [savedQueries, setSavedQueries] = useLocalStorage<string>(
+  const [savedQueries, setSavedQueries] = useLocalStorage<Queries>(
     "queries",
     {}
   );
 
-  const getNextId = () => {
-    const currentHighest =
-      Math.max(...Object.keys(savedQueries).map((n) => parseInt(n, 10))) || 0;
-    return currentHighest + 1;
+  const getNextId = (): string => {
+    if (queryId && queryId !== "new") return String(queryId);
+    const currentHighest = Math.max(
+      ...Object.keys(savedQueries).map((n) => parseInt(n, 10)),
+      0
+    );
+    return String(currentHighest + 1);
   };
 
   // adios! :D
   // du må gjerne committe denne koden :-)
   // will d
   // thanks! :D vi snakkes :) :wave:
-  const handleSave = (queryToStore: string, id: number) => {
-    // const nextQueries: Queries = {
-    //   ...savedQueries,
-    //   [id]: { query: queryToStore },
-    // };
-    setSavedQueries((prevQueries) => ({
-      ...prevQueries,
+  const handleSave = (queryToStore: string, id: string) => {
+    setSavedQueries({
+      ...savedQueries,
       [id]: { query: queryToStore, id },
-    }));
+    });
+    router.push(id);
   };
 
-  const router = useRouter();
-  const { queryId } = router.query;
-
   const handleResetDB = async () => {
-    const { success, error } = await (await fetch("api/reset-db")).json();
+    const { success, error } = await (
+      await fetch(`${BASE_URL}/reset-db`)
+    ).json();
     if (success) {
       message.success("DB reset successful");
     } else {
@@ -69,7 +74,7 @@ export default function Home(): JSX.Element {
   };
 
   const handleRunQuery = async () => {
-    const res = await fetch("api/query", {
+    const res = await fetch(`${BASE_URL}/query`, {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
@@ -85,6 +90,14 @@ export default function Home(): JSX.Element {
       setResultRows(rows);
     }
   };
+
+  useEffect(() => {
+    if (queryId === "new") {
+      setUserQuery("");
+    } else {
+      setUserQuery(savedQueries[String(queryId)]?.query);
+    }
+  }, [queryId]);
 
   useEffect(() => {
     if (!resultRows.length) {
@@ -110,12 +123,24 @@ export default function Home(): JSX.Element {
       <Content>
         <QueryWrapper>
           <Toolbar>
-            <Select>
+            <Select
+              value={queryId}
+              onChange={(goToId) => router.push(`${goToId}`)}
+              style={{ width: "100%" }}
+            >
               {Object.values(savedQueries).map((q) => (
-                <Select.Option key={q.id}>{q.id}</Select.Option>
+                <Select.Option value={q.id} key={q.id}>
+                  {q.id}
+                </Select.Option>
               ))}
+              <Select.Option value="new" key="new">
+                + New query
+              </Select.Option>
             </Select>
-            <Button onClick={() => handleSave(userQuery, getNextId())}>
+            <Button
+              onClick={() => handleSave(userQuery, getNextId())}
+              type="primary"
+            >
               Save
             </Button>
           </Toolbar>
@@ -164,6 +189,9 @@ export default function Home(): JSX.Element {
 
 const Toolbar = styled.div`
   padding: 10px;
+  display: flex;
+  flex-direction: row;
+  justify-content: space-between;
 `;
 
 const Container = styled.div`
