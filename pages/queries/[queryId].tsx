@@ -10,9 +10,12 @@ import { Resizable } from "re-resizable";
 import { useRouter } from "next/router";
 import useLocalStorage from "hooks/useLocalStorage";
 
-const BASE_URL = "http://localhost:3000/api";
-
 type ResultRow = { [key: string]: string | number | any };
+
+interface Queries {
+  [key: string]: { query: string; id: string };
+}
+const BASE_URL = "http://localhost:3000/api";
 
 const parseTableColumns = (sampleRow: any) =>
   Object.keys(sampleRow).map((col) => ({
@@ -31,10 +34,6 @@ export default function Home(): JSX.Element {
   const [resultRows, setResultRows] = useState<ResultRow[]>([]);
   const [columns, setColumns] = useState<ColumnProps<ResultRow>[]>([]);
   const [errorMessage, setErrorMessage] = useState<string>("");
-
-  interface Queries {
-    [key: string]: { query: string; id: string };
-  }
 
   const [savedQueries, setSavedQueries] = useLocalStorage<Queries>(
     "queries",
@@ -115,7 +114,7 @@ export default function Home(): JSX.Element {
         <link rel="icon" href="/favicon.ico" />
       </Head>
       <TitleWrapper>
-        <Title>SQL Explorer {queryId}</Title>
+        <Title>SQL Explorer</Title>
         <Button onClick={handleResetDB} type="primary" danger>
           Reset DB
         </Button>
