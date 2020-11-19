@@ -34,6 +34,7 @@ export default function Home(): JSX.Element {
   const [resultRows, setResultRows] = useState<ResultRow[]>([]);
   const [columns, setColumns] = useState<ColumnProps<ResultRow>[]>([]);
   const [errorMessage, setErrorMessage] = useState<string>("");
+  const [isResettingDB, setIsResettingDB] = useState<boolean>(false);
 
   const [savedQueries, setSavedQueries] = useLocalStorage<Queries>(
     "queries",
@@ -49,10 +50,6 @@ export default function Home(): JSX.Element {
     return String(currentHighest + 1);
   };
 
-  // adios! :D
-  // du må gjerne committe denne koden :-)
-  // will d
-  // thanks! :D vi snakkes :) :wave:
   const handleSave = (queryToStore: string, id: string) => {
     setSavedQueries({
       ...savedQueries,
@@ -62,6 +59,7 @@ export default function Home(): JSX.Element {
   };
 
   const handleResetDB = async () => {
+    setIsResettingDB(true);
     const { success, error } = await (
       await fetch(`${BASE_URL}/reset-db`)
     ).json();
@@ -70,6 +68,7 @@ export default function Home(): JSX.Element {
     } else {
       message.error(error);
     }
+    setIsResettingDB(false);
   };
 
   const handleRunQuery = async () => {
@@ -115,7 +114,12 @@ export default function Home(): JSX.Element {
       </Head>
       <TitleWrapper>
         <Title>SQL Explorer</Title>
-        <Button onClick={handleResetDB} type="primary" danger>
+        <Button
+          loading={isResettingDB}
+          onClick={handleResetDB}
+          type="primary"
+          danger
+        >
           Reset DB
         </Button>
       </TitleWrapper>
