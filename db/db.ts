@@ -9,7 +9,7 @@ const localPgConfig = {
 };
 
 const DB_SETUP_SCRIPT_URL =
-  "https://gist.githubusercontent.com/mewwts/ddaf0724a285782dc54b70411776fbc7/raw/09c8617a6d41f6c5ce8ee192a1c66ed0f1ff1580/blocks.sql";
+  "https://gist.github.com/mortenhillbom/825afa949b6187e047772a6a025994cf/raw/117c11dd37c28c12e7348ed7557f31b74ba38add/shakespear.sql";
 
 const bytArrayParse = (val: string) => {
   return val.replace("\\", "0");
@@ -41,10 +41,8 @@ export const resetDb = async (): Promise<{
   success: boolean;
   error?: string;
 }> => {
-  const cleanUpQuery = "DROP TABLE IF EXISTS blocks;";
   const setUpQuery = await fetch(DB_SETUP_SCRIPT_URL).then((res) => res.text());
   try {
-    await sqlQuery(cleanUpQuery);
     await sqlQuery(setUpQuery);
     return { success: true };
   } catch (e) {
