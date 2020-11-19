@@ -1,7 +1,14 @@
 # SQL Front End
 
-I managed to get it working functionally in four hours, but as you can see the front end looks kinda lame. I couldn't resist and had to make it look a bit better. Those changes can be found in the branch `overtime`, I didn't speend so much time on this though
+A basic UI to run SQL queries against a database, and see the results in a table.
+You can also save your favorite queries for later use (stored in local storage).
 
+When clicking "Reset DB", the database is filled with Shakespeare. The tables available are `work`, `character`, `chapter`, and `paragraph`.
+
+
+<img src="screenshots/dramatic_scene.png" alt="Romeo and Juliet example query" width="960px"/>
+
+> You can actually read some Shakespeare if you want, but it's quite dramatic, so be careful.
 
 ## Instructions
 This project is dependent on a postgres instance running on port 5432.
